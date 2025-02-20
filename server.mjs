@@ -4,13 +4,13 @@ import fs from "fs";
 import path from "path";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
 app.use(cors());
 app.use(express.json());
 
 // Define file path in a writable directory
-const filePath = path.join("/tmp", "token_launch_data.json");
+const filePath = path.join(process.cwd(), "token_launch_data.json");
 
 // Webhook endpoint
 app.post("/webhook", (req, res) => {
@@ -77,4 +77,18 @@ app.get("/", (req, res) => {
   res.send("\u2705 Helius Webhook Server is Running!");
 });
 
-app.listen(PORT, () => console.log(`\u2705 Server running on port ${PORT}`));
+app.get("/check-file", (req, res) => {
+  try {
+    if (fs.existsSync(filePath)) {
+      const fileData = fs.readFileSync(filePath, "utf8");
+      res.json({ success: true, data: JSON.parse(fileData) });
+    } else {
+      res.json({ success: false, message: "File does not exist" });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Start the server
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
