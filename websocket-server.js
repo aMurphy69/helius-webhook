@@ -2,7 +2,7 @@ import { WebSocketServer } from "ws";
 import express from "express";
 import http from "http";
 
-const PORT = process.env.WEBSOCKET_PORT || 10001; // Use a different port from server.mjs
+const PORT = process.env.PORT || 10001; // Use Render's assigned port
 const app = express();
 const server = http.createServer(app);
 
