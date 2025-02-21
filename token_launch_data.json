@@ -1,0 +1,9 @@
+[
+  {
+    "signature": "test-signature-123",
+    "timestamp": 1234567890,
+    "mintAddress": "FakeMintAddress123",
+    "bondingCurve": "FakeBondingCurveAddress456",
+    "associatedBondingCurve": "FakeAssociatedBondingCurveAddress789"
+  }
+]

@@ -4,15 +4,15 @@ import fs from "fs";
 import path from "path";
 
 const app = express();
-const PORT = process.env.PORT || 10000; // Ensure correct port from Render logs
+const PORT = process.env.PORT || 3000; // Force Render to use the correct port
 
 app.use(cors());
 app.use(express.json());
 
-// Define file path in the writable /tmp/ directory
+// ✅ Define file path in the writable /tmp/ directory
 const filePath = "/tmp/token_launch_data.json";
 
-// Webhook endpoint
+// ✅ Webhook endpoint
 app.post("/webhook", (req, res) => {
   console.log("🚀 Received Helius Webhook:", JSON.stringify(req.body, null, 2));
 
@@ -37,9 +37,8 @@ app.post("/webhook", (req, res) => {
         console.log(`📂 Writing file to: ${filePath}`);
 
         try {
-          // Force recreate the file every time to ensure it's fresh
+          // ✅ Overwrite the file with new data every time
           fs.writeFileSync(filePath, JSON.stringify([launchData], null, 2), "utf8");
-
           console.log("✅ Token launch data saved successfully.");
         } catch (fsError) {
           console.error("❌ File write error:", fsError);
@@ -55,12 +54,12 @@ app.post("/webhook", (req, res) => {
   }
 });
 
-// Home Route (for checking if the server is running)
+// ✅ Home Route (for checking if the server is running)
 app.get("/", (req, res) => {
   res.send("✅ Helius Webhook Server is Running!");
 });
 
-// Check File Route - Ensures the JSON file exists and is readable
+// ✅ Check File Route
 app.get("/check-file", (req, res) => {
   try {
     if (fs.existsSync(filePath)) {
@@ -74,5 +73,5 @@ app.get("/check-file", (req, res) => {
   }
 });
 
-// Start the server
+// ✅ Start the server
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
