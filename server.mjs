@@ -4,15 +4,16 @@ import fs from "fs";
 import path from "path";
 
 const app = express();
-const PORT = process.env.PORT || 3000; // Force Render to use the correct port
+const PORT = process.env.PORT || 10000; // Render dynamically assigns a port
 
 app.use(cors());
 app.use(express.json());
 
-// ✅ Define file path in the writable /tmp/ directory
-const filePath = "/tmp/token_launch_data.json";
+const filePath = "/tmp/token_launch_data.json"; // Temporary storage
 
-// ✅ Webhook endpoint
+/**
+ * ✅ Webhook endpoint for Helius transactions
+ */
 app.post("/webhook", (req, res) => {
   console.log("🚀 Received Helius Webhook:", JSON.stringify(req.body, null, 2));
 
@@ -24,6 +25,7 @@ app.post("/webhook", (req, res) => {
         const mintAddress = tx.tokenTransfers?.[0]?.mint || "Unknown";
         const bondingCurve = tx.tokenTransfers?.[0]?.toUserAccount || "Unknown";
         const associatedBondingCurve = tx.tokenTransfers?.[1]?.toUserAccount || "Unknown";
+        const metadata = tx.metadata || "Unknown";
 
         const launchData = {
           signature: tx.signature,
@@ -31,6 +33,7 @@ app.post("/webhook", (req, res) => {
           mintAddress,
           bondingCurve,
           associatedBondingCurve,
+          metadata,
         };
 
         console.log("🔥 New Token Launch Detected:", launchData);
@@ -54,24 +57,5 @@ app.post("/webhook", (req, res) => {
   }
 });
 
-// ✅ Home Route (for checking if the server is running)
-app.get("/", (req, res) => {
-  res.send("✅ Helius Webhook Server is Running!");
-});
-
-// ✅ Check File Route
-app.get("/check-file", (req, res) => {
-  try {
-    if (fs.existsSync(filePath)) {
-      const fileData = fs.readFileSync(filePath, "utf8");
-      res.json({ success: true, data: JSON.parse(fileData) });
-    } else {
-      res.json({ success: false, message: "File does not exist" });
-    }
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-// ✅ Start the server
+// ✅ Start the Express server
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
