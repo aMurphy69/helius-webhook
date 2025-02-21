@@ -24,7 +24,7 @@ wss.on("connection", (ws) => {
 // Start HTTP Server & Upgrade WebSocket Connections
 server.listen(PORT, () => {
   const wsUrl = process.env.RENDER_EXTERNAL_URL
-    ? `wss://${process.env.RENDER_EXTERNAL_URL}`
+    ? `wss://${process.env.RENDER_EXTERNAL_URL.replace(/^https?:\/\//, "")}`
     : `ws://localhost:${PORT}`;
   
   console.log(`📡 WebSocket Server running on ${wsUrl}`);
