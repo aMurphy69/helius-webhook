@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 // Define file path in a writable directory
-const filePath = path.join(process.cwd(), "token_launch_data.json");
+const filePath = "/tmp/token_launch_data.json";
 
 // Webhook endpoint
 app.post("/webhook", (req, res) => {
