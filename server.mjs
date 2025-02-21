@@ -4,17 +4,17 @@ import fs from "fs";
 import path from "path";
 
 const app = express();
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 10000; // Ensure correct port from Render logs
 
 app.use(cors());
 app.use(express.json());
 
-// Define file path in a writable directory
+// Define file path in the writable /tmp/ directory
 const filePath = "/tmp/token_launch_data.json";
 
 // Webhook endpoint
 app.post("/webhook", (req, res) => {
-  console.log("\ud83d\ude80 Received Helius Webhook:", JSON.stringify(req.body, null, 2));
+  console.log("🚀 Received Helius Webhook:", JSON.stringify(req.body, null, 2));
 
   try {
     const transactions = req.body || [];
@@ -33,33 +33,16 @@ app.post("/webhook", (req, res) => {
           associatedBondingCurve,
         };
 
-        console.log("\ud83d\udd25 New Token Launch Detected:", launchData);
-
-        // Log file path
-        console.log(`\ud83d\udcda Writing file to: ${filePath}`);
+        console.log("🔥 New Token Launch Detected:", launchData);
+        console.log(`📂 Writing file to: ${filePath}`);
 
         try {
-          // Ensure file exists before writing
-          if (!fs.existsSync(filePath)) {
-            fs.writeFileSync(filePath, "[]", { flag: "w" }); // Create empty JSON array
-          }
+          // Force recreate the file every time to ensure it's fresh
+          fs.writeFileSync(filePath, JSON.stringify([launchData], null, 2), "utf8");
 
-          // Read existing data
-          const fileData = fs.readFileSync(filePath, "utf8");
-          const jsonData = fileData ? JSON.parse(fileData) : [];
-
-          // Remove old entry if it exists (avoiding duplicates)
-          const updatedData = jsonData.filter(entry => entry.signature !== launchData.signature);
-          
-          // Append new entry
-          updatedData.push(launchData);
-
-          // Write updated data back to file
-          fs.writeFileSync(filePath, JSON.stringify(updatedData, null, 2));
-
-          console.log("\u2705 Token launch data saved successfully.");
+          console.log("✅ Token launch data saved successfully.");
         } catch (fsError) {
-          console.error("\u274c File write error:", fsError);
+          console.error("❌ File write error:", fsError);
         }
       }
     });
@@ -67,16 +50,17 @@ app.post("/webhook", (req, res) => {
     res.status(200).json({ message: "Webhook processed successfully" });
 
   } catch (error) {
-    console.error("\u274c Error processing webhook:", error);
+    console.error("❌ Error processing webhook:", error);
     res.status(500).json({ message: "Error processing webhook" });
   }
 });
 
 // Home Route (for checking if the server is running)
 app.get("/", (req, res) => {
-  res.send("\u2705 Helius Webhook Server is Running!");
+  res.send("✅ Helius Webhook Server is Running!");
 });
 
+// Check File Route - Ensures the JSON file exists and is readable
 app.get("/check-file", (req, res) => {
   try {
     if (fs.existsSync(filePath)) {
