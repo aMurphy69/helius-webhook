@@ -2,7 +2,7 @@ import { WebSocketServer } from "ws";
 import express from "express";
 import http from "http";
 
-const PORT = process.env.PORT || 10001; // Use Render's assigned port
+const PORT = process.env.PORT || 10001; // Use Render-assigned port if available
 const app = express();
 const server = http.createServer(app);
 
@@ -23,5 +23,9 @@ wss.on("connection", (ws) => {
 
 // Start HTTP Server & Upgrade WebSocket Connections
 server.listen(PORT, () => {
-  console.log(`📡 WebSocket Server running on ws://localhost:${PORT}`);
+  const wsUrl = process.env.RENDER_EXTERNAL_URL
+    ? `wss://${process.env.RENDER_EXTERNAL_URL}`
+    : `ws://localhost:${PORT}`;
+  
+  console.log(`📡 WebSocket Server running on ${wsUrl}`);
 });
